@@ -1,5 +1,8 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Box, TextField, Button, CssBaseline } from "@mui/material";
+import { useLoginMutation } from "../redux/api/apiSlice";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 type Inputs = {
   name: string;
@@ -7,17 +10,23 @@ type Inputs = {
   password: string;
 };
 
-function App() {
-  const {
-    register,
-    handleSubmit,
-  } = useForm<Inputs>();
+const textFieldStyles = {
+  width: "100%"
+};
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+function LoginPage() {
+  const [login, { isError, isLoading, isSuccess }] = useLoginMutation();
+  const navigate = useNavigate();
+  const { register, handleSubmit } = useForm<Inputs>();
 
-  const textFieldStyles = {
-    width: "100%"
-  };
+  const onSubmit: SubmitHandler<Inputs> = (data) => login(data)
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate("/dashboard");
+    }
+  }, [isSuccess, navigate]);
+
   return (
     <div style={{ width: "100%", height: "100vh", border: "1px solid green" }}>
       <CssBaseline />
@@ -25,7 +34,12 @@ function App() {
         component={"form"}
         autoComplete="off"
         onSubmit={handleSubmit(onSubmit)}
-        sx={{ margin: "0 auto", width: "40%", height: "80%", border: "1px solid red" }}
+        sx={{
+          margin: "0 auto",
+          width: "40%",
+          height: "80%",
+          border: "1px solid red"
+        }}
       >
         <Box
           flexDirection="column"
@@ -56,7 +70,7 @@ function App() {
             {...register("password")}
           />
           <Button type="submit" variant="contained" color="primary">
-            Submit
+            Login
           </Button>
         </Box>
       </Box>
@@ -64,4 +78,4 @@ function App() {
   );
 }
 
-export default App;
+export default LoginPage;
